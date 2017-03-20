@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyString
+  table_id: 1
+  data_type_id: 1
+
+two:
+  name: MyString
+  description: MyString
+  table_id: 1
+  data_type_id: 1

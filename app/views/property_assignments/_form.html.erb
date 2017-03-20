@@ -1,0 +1,29 @@
+<%= form_for(@property_assignment) do |f| %>
+  <% if @property_assignment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@property_assignment.errors.count, "error") %> prohibited this property_assignment from being saved:</h2>
+
+      <ul>
+      <% @property_assignment.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :field_id %><br>
+    <%= f.number_field :field_id %>
+  </div>
+  <div class="field">
+    <%= f.label :property_id %><br>
+    <%= f.number_field :property_id %>
+  </div>
+  <div class="field">
+    <%= f.label :value_id %><br>
+    <%= f.number_field :value_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
