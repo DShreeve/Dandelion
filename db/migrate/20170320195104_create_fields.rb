@@ -3,7 +3,7 @@ class CreateFields < ActiveRecord::Migration
     create_table :fields do |t|
       t.string :name
       t.string :description
-      t.integer :table_id
+      t.belongs_to :table, index: true
       t.integer :data_type_id
 
       t.timestamps null: false
