@@ -69,6 +69,6 @@ class PropertyAssignmentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def property_assignment_params
-      params.require(:property_assignment).permit(:field_id, :property_id, :value_id)
+      params.require(:property_assignment).permit(:field_id, :property_id)
     end
 end
