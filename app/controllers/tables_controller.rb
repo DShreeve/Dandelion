@@ -1,10 +1,11 @@
 class TablesController < ApplicationController
+  before_action :get_project
   before_action :set_table, only: [:show, :edit, :update, :destroy]
 
   # GET /tables
   # GET /tables.json
   def index
-    @tables = Table.all
+    @tables = @project.tables
   end
 
   # GET /tables/1
@@ -14,7 +15,7 @@ class TablesController < ApplicationController
 
   # GET /tables/new
   def new
-    @table = Table.new
+    @table = @project.tables.new
   end
 
   # GET /tables/1/edit
@@ -24,11 +25,11 @@ class TablesController < ApplicationController
   # POST /tables
   # POST /tables.json
   def create
-    @table = Table.new(table_params)
+    @table = @project.tables.new(table_params)
 
     respond_to do |format|
       if @table.save
-        format.html { redirect_to @table, notice: 'Table was successfully created.' }
+        format.html { redirect_to project_table_path(@project,@table), notice: 'Table was successfully created.' }
         format.json { render :show, status: :created, location: @table }
       else
         format.html { render :new }
@@ -42,7 +43,7 @@ class TablesController < ApplicationController
   def update
     respond_to do |format|
       if @table.update(table_params)
-        format.html { redirect_to @table, notice: 'Table was successfully updated.' }
+        format.html { redirect_to project_table_path(@project,@table), notice: 'Table was successfully updated.' }
         format.json { render :show, status: :ok, location: @table }
       else
         format.html { render :edit }
@@ -64,11 +65,15 @@ class TablesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_table
-      @table = Table.find(params[:id])
+      @table = @project.tables.find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def table_params
-      params.require(:table).permit(:name, :description, :project_id)
+      params.require(:table).permit(:name, :description)
+    end
+
+    def get_project
+      @project = Project.find(params[:project_id])
     end
 end

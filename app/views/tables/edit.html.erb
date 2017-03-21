@@ -2,5 +2,5 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Show', @table %> |
-<%= link_to 'Back', tables_path %>
+<%= link_to 'Show', project_table_path(@project,@table) %> |
+<%= link_to 'Back', project_tables_path(@project) %>
