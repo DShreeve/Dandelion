@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   resources :properties
   resources :data_types
   
+  get 'projects/:project_id' => 'tables#index'
+  get 'projects/:project_id/tables/:table_id' => 'fields#index'
+  
   
   resources :projects do
     resources :tables do

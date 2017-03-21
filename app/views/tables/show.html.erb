@@ -10,10 +10,7 @@
   <%= @table.description %>
 </p>
 
-<p>
-  <strong>Project:</strong>
-  <%= @table.project_id %>
-</p>
 
-<%= link_to 'Edit', edit_table_path(@table) %> |
-<%= link_to 'Back', tables_path %>
+
+<%= link_to 'Edit', edit_project_table_path(@project,@table) %> |
+<%= link_to 'Back', project_tables_path(@project) %>

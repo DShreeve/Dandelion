@@ -1,7 +1,7 @@
 class TablesController < ApplicationController
   before_action :get_project
   before_action :set_table, only: [:show, :edit, :update, :destroy]
-
+  
   # GET /tables
   # GET /tables.json
   def index
@@ -76,4 +76,5 @@ class TablesController < ApplicationController
     def get_project
       @project = Project.find(params[:project_id])
     end
+
 end

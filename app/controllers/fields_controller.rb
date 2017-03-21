@@ -1,10 +1,12 @@
 class FieldsController < ApplicationController
+  before_action :get_project
+  before_action :get_table
   before_action :set_field, only: [:show, :edit, :update, :destroy]
 
   # GET /fields
   # GET /fields.json
   def index
-    @fields = Field.all
+    @fields = @table.fields
   end
 
   # GET /fields/1
@@ -14,7 +16,7 @@ class FieldsController < ApplicationController
 
   # GET /fields/new
   def new
-    @field = Field.new
+    @field = @table.fields.new
   end
 
   # GET /fields/1/edit
@@ -24,11 +26,11 @@ class FieldsController < ApplicationController
   # POST /fields
   # POST /fields.json
   def create
-    @field = Field.new(field_params)
+    @field = @table.fields.new(field_params)
 
     respond_to do |format|
       if @field.save
-        format.html { redirect_to @field, notice: 'Field was successfully created.' }
+        format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Field was successfully created.' }
         format.json { render :show, status: :created, location: @field }
       else
         format.html { render :new }
@@ -42,7 +44,7 @@ class FieldsController < ApplicationController
   def update
     respond_to do |format|
       if @field.update(field_params)
-        format.html { redirect_to @field, notice: 'Field was successfully updated.' }
+        format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Field was successfully updated.' }
         format.json { render :show, status: :ok, location: @field }
       else
         format.html { render :edit }
@@ -56,7 +58,7 @@ class FieldsController < ApplicationController
   def destroy
     @field.destroy
     respond_to do |format|
-      format.html { redirect_to fields_url, notice: 'Field was successfully destroyed.' }
+      format.html { redirect_to project_table_path(@project, @table), notice: 'Field was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -69,6 +71,18 @@ class FieldsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def field_params
-      params.require(:field).permit(:name, :description, :table_id, :data_type_id)
+      params.require(:field).permit(:name, :description, :data_type_id)
     end
+
+    def get_project
+      @project = Project.find(params[:project_id])
+    end
+
+    def get_table
+      @table = @project.tables.find(params[:project_id])
+    end
+
+
+
+
 end
