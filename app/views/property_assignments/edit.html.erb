@@ -2,6 +2,8 @@
 
 <%= render 'form' %>
 
+
+<%= link_to 'Back', project_table_field_path(@project, @table, @field), class: "btn btn-default" %>
 <%= link_to 'Show', 
-  project_table_field_property_assignment_path(@project, @table, @field,@property_assignment) %> |
-<%= link_to 'Back', project_table_field_path(@project, @table, @field) %>
+  project_table_field_property_assignment_path(@project, @table, @field,@property_assignment),
+    class: "btn btn-success" %>

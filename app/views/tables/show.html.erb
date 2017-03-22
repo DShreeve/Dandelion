@@ -12,5 +12,6 @@
 
 
 
-<%= link_to 'Edit', edit_project_table_path(@project,@table) %> |
-<%= link_to 'Back', project_tables_path(@project) %>
+
+<%= link_to 'Back', project_tables_path(@project) , class: "btn btn-default"%>
+<%= link_to 'Edit', edit_project_table_path(@project,@table) , class: "btn btn-warning"%>

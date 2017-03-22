@@ -2,5 +2,6 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Show', project_table_field_path(@project, @table, @field) %> |
-<%= link_to 'Back', project_table_path(@project, @table) %>
+
+<%= link_to 'Back', project_table_path(@project, @table), class: "btn btn-default" %>
+<%= link_to 'Show', project_table_field_path(@project, @table, @field), class: "btn btn-success"%> 
