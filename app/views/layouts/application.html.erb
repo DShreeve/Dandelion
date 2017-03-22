@@ -8,6 +8,16 @@
 </head>
 <body>
 
+<nav class="navbar navbar-default">
+  <ul class="nav navbar-nav">
+    <li class="<%= 'active' if params[:controller] == 'projects' %>">
+      <%= link_to 'Projects', projects_path %> </li>
+    <li class="<%= 'active' if params[:controller] == 'properties' %>"> 
+      <%= link_to 'Properties', properties_path %> </li>
+    <li class="<%= 'active' if params[:controller] == 'data_types' %>"> 
+      <%= link_to 'Data Types', data_types_path %> </li>
+  </ul>
+</nav>
 <%= yield %>
 
 </body>
