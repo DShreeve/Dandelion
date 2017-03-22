@@ -17,7 +17,7 @@ class ValuesController < ApplicationController
 
   # GET /values/new
   def new
-    @value = @property_assignment.value.new
+    @value = @property_assignment.build_value
   end
 
   # GET /values/1/edit
@@ -27,11 +27,11 @@ class ValuesController < ApplicationController
   # POST /values
   # POST /values.json
   def create
-    @value = @property_assignment.value.new(value_params)
+    @value = @property_assignment.build_value(value_params)
 
     respond_to do |format|
       if @value.save
-        format.html { redirect_to project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value) , notice: 'Value was successfully created.' }
+        format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Value was successfully created.' }
         format.json { render :show, status: :created, location: @value }
       else
         format.html { render :new }
@@ -45,7 +45,7 @@ class ValuesController < ApplicationController
   def update
     respond_to do |format|
       if @value.update(value_params)
-        format.html { redirect_to redirect_to project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value), notice: 'Value was successfully updated.' }
+        format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Value was successfully updated.' }
         format.json { render :show, status: :ok, location: @value }
       else
         format.html { render :edit }
@@ -59,7 +59,7 @@ class ValuesController < ApplicationController
   def destroy
     @value.destroy
     respond_to do |format|
-      format.html { redirect_to project_table_field_property_assignment_path(@project, @table, @field,@property_assignment), notice: 'Value was successfully destroyed.' }
+      format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Value was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

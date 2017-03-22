@@ -15,7 +15,6 @@ Rails.application.routes.draw do
   get 'projects/:project_id' => 'tables#index'
   get 'projects/:project_id/tables/:table_id' => 'fields#index'
   get 'projects/:project_id/tables/:table_id/fields/:field_id' => 'property_assignments#index'
-  get 'projects/:project_id/tables/:table_id/fields/:field_id/property_assignments/:property_assignment_id' => 'values#index'
   
   
   resources :projects do

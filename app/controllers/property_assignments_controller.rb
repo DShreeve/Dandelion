@@ -31,7 +31,7 @@ class PropertyAssignmentsController < ApplicationController
 
     respond_to do |format|
       if @property_assignment.save
-        format.html { redirect_to project_table_field_property_assignment_path(@project, @table, @field,@property_assignment), notice: 'Property assignment was successfully created.' }
+        format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Property assignment was successfully created.' }
         format.json { render :show, status: :created, location: @property_assignment }
       else
         format.html { render :new }
@@ -45,7 +45,7 @@ class PropertyAssignmentsController < ApplicationController
   def update
     respond_to do |format|
       if @property_assignment.update(property_assignment_params)
-        format.html { redirect_to project_table_field_property_assignment_path(@project, @table, @field,@property_assignment), notice: 'Property assignment was successfully updated.' }
+        format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Property assignment was successfully updated.' }
         format.json { render :show, status: :ok, location: @property_assignment }
       else
         format.html { render :edit }

@@ -7,7 +7,7 @@
     <tr>
       <th>Property</th>
       <th>Value</th>
-      <th colspan="3"></th>
+      <th colspan="2"></th>
     </tr>
   </thead>
 
@@ -15,10 +15,14 @@
     <% @property_assignments.each do |property_assignment| %>
       <tr>
         <td><%= property_assignment.property_id %></td>
-        <td><%= link_to 'Show', project_table_field_property_assignment_path(@project, 
-          @table, @field,property_assignment) %></td>
-        <td><%= link_to 'Edit', edit_project_table_field_property_assignment_path(@project, 
-          @table, @field,property_assignment) %></td>
+        
+        <% if property_assignment.value == nil %>
+          <td>no value</td>
+          <td><%= link_to 'Assign Value', new_project_table_field_property_assignment_value_path(@project, @table, @field, property_assignment) %></td>
+        <% else %>
+          <td> <%= property_assignment.value.value %></td>
+          <td><%= link_to 'Edit Value', edit_project_table_field_property_assignment_value_path(@project, @table, @field, property_assignment, property_assignment.value) %></td>
+        <% end %>
         <td><%= link_to 'Destroy', project_table_field_property_assignment_path(@project, 
           @table, @field,property_assignment), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
