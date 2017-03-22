@@ -12,19 +12,17 @@
   </thead>
 
   <tbody>
-    <% @values.each do |value| %>
-      <tr>
-        <td><%= value.value %></td>
-        <td><%= value.data_type_id %></td>
-        <td><%= value.property_assignment_id %></td>
-        <td><%= link_to 'Show', value %></td>
-        <td><%= link_to 'Edit', edit_value_path(value) %></td>
-        <td><%= link_to 'Destroy', value, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
+    <tr>
+      <td><%= @value.value %></td>
+      <td><%= @value.data_type_id %></td>
+      <td><%= @value.property_assignment_id %></td>
+      <td><%= link_to 'Show', project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value) %></td>
+      <td><%= link_to 'Edit', edit_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value) %></td>
+      <td><%= link_to 'Destroy', project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    </tr>
   </tbody>
 </table>
 
 <br>
-
-<%= link_to 'New Value', new_value_path %>
+<%= link_to 'Back', project_table_field_property_assignments_path(@project,@table,@field,@property_assignment) %>
+<%= link_to 'New Value', new_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment) %>

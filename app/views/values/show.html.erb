@@ -10,10 +10,7 @@
   <%= @value.data_type_id %>
 </p>
 
-<p>
-  <strong>Data type:</strong>
-  <%= @value.property_assignment_id %>
-</p>
 
-<%= link_to 'Edit', edit_value_path(@value) %> |
-<%= link_to 'Back', values_path %>
+
+<%= link_to 'Edit', edit_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, value) %> |
+<%= link_to 'Back', project_table_field_property_assignment_path(@project, @table, @field,@property_assignment) %>

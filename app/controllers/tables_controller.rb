@@ -57,7 +57,7 @@ class TablesController < ApplicationController
   def destroy
     @table.destroy
     respond_to do |format|
-      format.html { redirect_to tables_url, notice: 'Table was successfully destroyed.' }
+      format.html { redirect_to project_path(@project), notice: 'Table was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

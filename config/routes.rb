@@ -3,9 +3,19 @@ Rails.application.routes.draw do
   
   resources :properties
   resources :data_types
+
+  #new
+  get 'projects/new' => 'projects#new'
+  get 'projects/:project_id/tables/new' => 'tables#new'
+  get 'projects/:project_id/tables/:table_id/fields/new' => 'fields#new'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id/property_assignments/new' => 'property_assignments#new'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id/property_assignments/:property_assignment_id/values/new' => 'values#new'
   
+  #show => index
   get 'projects/:project_id' => 'tables#index'
   get 'projects/:project_id/tables/:table_id' => 'fields#index'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id' => 'property_assignments#index'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id/property_assignments/:property_assignment_id' => 'values#index'
   
   
   resources :projects do

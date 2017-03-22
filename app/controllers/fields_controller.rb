@@ -66,7 +66,7 @@ class FieldsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_field
-      @field = Field.find(params[:id])
+      @field = @table.fields.find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
@@ -79,7 +79,7 @@ class FieldsController < ApplicationController
     end
 
     def get_table
-      @table = @project.tables.find(params[:project_id])
+      @table = @project.tables.find(params[:table_id])
     end
 
 

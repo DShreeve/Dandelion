@@ -2,5 +2,5 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Show', @value %> |
-<%= link_to 'Back', values_path %>
+<%= link_to 'Show', project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value) %> |
+<%= link_to 'Back', project_table_field_property_assignment_path(@project, @table, @field,@property_assignment) %>
