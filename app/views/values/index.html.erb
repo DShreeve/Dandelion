@@ -2,7 +2,7 @@
 
 <h1>Listing Values</h1>
 
-<table class="table-hover">
+<table class="table table-hover">
   <thead>
     <tr>
       <th>Value</th>
@@ -24,5 +24,5 @@
 </table>
 
 <br>
-<%= link_to 'Back', project_table_field_property_assignments_path(@project,@table,@field,@property_assignment) %>
-<%= link_to 'New Value', new_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment) %>
+<%= link_to 'Back', project_table_field_property_assignments_path(@project,@table,@field,@property_assignment), class:"btn btn-default"%>
+<%= link_to 'New Value', new_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment), class: "btn btn-primary"  %>

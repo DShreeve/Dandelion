@@ -2,7 +2,7 @@
 
 <h1>Listing Property Assignments</h1>
 
-<table class="table-hover">
+<table class="table table-hover">
   <thead>
     <tr>
       <th>Property</th>
@@ -27,6 +27,6 @@
 </table>
 
 <br>
-<%= link_to 'Back', project_table_fields_path(@project, @table, @field) %>
+<%= link_to 'Back', project_table_fields_path(@project, @table, @field), class:"btn btn-default" %>
 <%= link_to 'New Property assignment', new_project_table_field_property_assignment_path(
-  @project, @table, @field) %>
+  @project, @table, @field), class: "btn btn-primary"  %>

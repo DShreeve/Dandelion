@@ -2,7 +2,7 @@
 
 <h1>Listing Tables</h1>
 
-<table class="table-hover">
+<table class="table table-hover">
   <thead>
     <tr>
       <th>Name</th>
@@ -25,5 +25,5 @@
 </table>
 
 <br>
-<%= link_to 'Back', projects_path %> |
-<%= link_to 'New Table', new_project_table_path(@project) %>
+<%= link_to 'Back', projects_path, class:"btn btn-default" %>
+<%= link_to 'New Table', new_project_table_path(@project), class: "btn btn-primary"  %>
