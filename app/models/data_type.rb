@@ -10,4 +10,8 @@
 #
 
 class DataType < ActiveRecord::Base
+
+  validates :name, format: {with: /\A[A-Z].*\Z/, message: "Must start with capital letter"},
+    presence: true, uniqueness: true
+
 end

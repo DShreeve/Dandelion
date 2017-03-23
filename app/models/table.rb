@@ -12,5 +12,10 @@
 
 class Table < ActiveRecord::Base
   belongs_to :project
-  has_many :fields, dependent: :destroy
+  has_many :fields, dependent: :destroy, inverse_of: :table_id
+
+  validates :name, format: {with: /\A[A-Z].*\Z/, message: "Must start with capital letter"},
+    presence: true, uniqueness: true
+
+  validates :project_id, presence: true
 end

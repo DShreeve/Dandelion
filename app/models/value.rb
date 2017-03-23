@@ -10,6 +10,15 @@
 #  updated_at             :datetime         not null
 #
 
+
+
 class Value < ActiveRecord::Base
   belongs_to :property_assignment
+
+  validates :value , presence: true
+
+  validates :data_type_id , presence: true
+
+  validates :property_assignment_id , presence: true
+
 end

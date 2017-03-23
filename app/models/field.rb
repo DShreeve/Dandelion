@@ -15,4 +15,14 @@ class Field < ActiveRecord::Base
   belongs_to :table
   has_many :property_assignments, dependent: :destroy
   has_many :properties, through: :property_assignments
+
+  validates :name, 
+    format: {with: /\A[A-Z].*\Z/, message: "Must start with capital letter"},
+    presence: true, 
+    uniqueness: {scope: :table_id, message:"Field already present in table"}
+
+  validates :table_id, presence: :true
+
+  validates :data_type_id, presence: :true
+  
 end
