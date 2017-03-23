@@ -12,7 +12,7 @@
 class PropertyAssignment < ActiveRecord::Base
   belongs_to :property
   belongs_to :field
-  has_one :value, dependent: :destroy, inverse_of: :property_assignment_id
+  has_one :value, dependent: :destroy, inverse_of: :property_assignment
 
   validates :field_id, presence: true
 

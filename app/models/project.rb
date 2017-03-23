@@ -10,7 +10,7 @@
 #
 
 class Project < ActiveRecord::Base
-  has_many :tables, dependent: :destroy, inverse_of: :project_id
+  has_many :tables, dependent: :destroy, inverse_of: :project
   
   validates :name, format: {with: /\A[A-Z].*\Z/, message: "Must start with capital letter"},
     presence: true, uniqueness: true

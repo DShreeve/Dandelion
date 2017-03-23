@@ -13,7 +13,7 @@
 
 class Field < ActiveRecord::Base
   belongs_to :table
-  has_many :property_assignments, dependent: :destroy
+  has_many :property_assignments, dependent: :destroy, inverse_of: :field
   has_many :properties, through: :property_assignments
 
   validates :name, 
@@ -21,7 +21,7 @@ class Field < ActiveRecord::Base
     presence: true, 
     uniqueness: {scope: :table_id, message:"Field already present in table"}
 
-  validates :table_id, presence: :true
+  validates :table, presence: :true
 
   validates :data_type_id, presence: :true
   
