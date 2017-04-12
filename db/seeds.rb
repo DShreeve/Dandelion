@@ -36,6 +36,15 @@ project = Project.create( name: "Test Project", description: "A Project for test
 
 employee = project.tables.create( name: "Employee", description: "Employee Information")
 
+employee_first_name = employee.fields.create( name: "first_name", description: "First name of employee", data_type_id: 2 )
+
+employee_last_name = employee.fields.create( name: "last_name", description: "Surname of employee", data_type_id: 2 )
+employee_age = employee.fields.create( name: "age", description: "Age of employee", data_type_id: 1 )
+employee_age_gt = employee_age.property_assignments.create(property_id: 2)
+employee_age_gt.create_value(value:"18",data_type_id: 1)
+employee_age_lt = employee_age.property_assignments.create(property_id: 5)
+employee_age_lt.create_value(value:"80",data_type_id: 1)
+
 store = project.tables.create( name: "Store", description: "Store Information")
 
 vehicle = project.tables.create( name: "Vehicle", description: "Vehicle Information")

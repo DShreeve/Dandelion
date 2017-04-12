@@ -17,7 +17,7 @@ class Field < ActiveRecord::Base
   has_many :properties, through: :property_assignments
 
   validates :name, 
-    format: {with: /\A[A-Z].*\Z/, message: "Must start with capital letter"},
+    format: {with: /\A[a-z].*\Z/, message: "Must not start with capital letter"},
     presence: true, 
     uniqueness: {scope: :table_id, message:"Field already present in table"}
 

@@ -74,15 +74,65 @@ class TablesController < ApplicationController
     file.puts ""
     file.puts "desrcibe \"" + table.name.titleize + "\" do"
     file.puts ""
-
+    file << factory(table.name)
     #Context loop for each field
     table.fields.each do |f|
-      file.puts "\tcontext \"" + f.name + " property\" do"
+      file.puts "\tdescribe \"" + f.name + " field has property\" do"
+      file.puts ""
+      f.property_assignments.each do |p|
+        file.puts "\t\tcontext \"" + Property.find(p.property_id).name + " " + p.value.value + "\" do"
+        file << (property_write(table.name.downcase, f.name,"<@valid>", "<@in_valid>", Property.find(p.property_id).rule,p.value.value))
+        file.puts "\t\tend"
+        file.puts ""
+      end
+
+      file.puts "\tend"
+      file.puts ""
     end
-    file.puts ""
 
     #End
+
     file.puts "end"
+    file.close
+  end
+
+  def factory(name)
+    tab = "\t"
+    intro = tab*1 + "it \"has a valid factory\" do"
+    main = tab*2 + "expect(build(:" + name.downcase + ")).to be_valid"
+    last = tab*1 + "end"
+    return intro + "\n" + main + "\n" +last +"\n\n"
+  end
+
+  def property_write(table,field, gen_v, gen_iv, rule, chosen)
+    tab = "\t"
+    n = "\n"
+
+    value_intro = tab*3 + "it \"generated a correct valid value\" do"
+    value_main = tab*4 + "expect(" + gen_v +").to be " + rule + " " + chosen
+    value_end = tab*3 + "end"
+    value_whole = value_intro + n + value_main + n + value_end + n
+
+    valid_intro = tab*3 + "it \"is valid with generated value\" do"
+    valid_main_1 = tab*4 + table + " = build(:" + table + "," + field + ": " + gen_v + ")"
+    valid_main_2 = tab*4 + "if " + table + ".respond_to?(:valid?)"
+    valid_main_3 = tab*5 + "expect(" + table + ").to be_valid, lambda { " + table + ".errors.full_messages.join(\"\\n\") }"
+    valid_end = tab*4 + "end" + n + tab*3 + "end"
+    valid_whole = valid_intro + n + valid_main_1 + n + valid_main_2 + n + valid_main_3 + n + valid_end + n 
+
+    in_value_intro = tab*3 + "it \"generated a correct invalid value\" do"
+    in_value_main = tab*4 + "expect(" + gen_iv +").to_not be " + rule + " " + chosen
+    in_value_end = tab*3 + "end"
+    in_value_whole = in_value_intro + n + in_value_main + n + in_value_end + n
+
+    in_valid_intro = tab*3 + "it \"is invalid with generated value\" do"
+    in_valid_main_1 = tab*4 + table + " = build(:" + table + "," + field + ": " + gen_iv + ")"
+    in_valid_main_2 = tab*4 + "if " + table + ".respond_to?(:valid?)"
+    in_valid_main_3 = tab*5 + "expect(" + table + ").to_not be_valid, lambda { " + table + ".errors.full_messages.join(\"\\n\") }"
+    in_valid_end = tab*4 + "end" + n + tab*3 + "end"
+    in_valid_whole = in_valid_intro + n + in_valid_main_1 + n + in_valid_main_2 + n + in_valid_main_3 + n + in_valid_end + n 
+
+    return value_whole +  valid_whole + in_value_whole + in_valid_whole 
   end
 
 
