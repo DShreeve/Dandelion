@@ -62,6 +62,32 @@ class TablesController < ApplicationController
     end
   end
 
+  ###########################################################################
+
+  def write_test(id)
+    table = Table.find(id)
+    fileName = table.name.downcase + "_spec.rb"
+    file = File.open( fileName, "w")
+
+    #Start
+    file.puts "require \"spec_helper\""
+    file.puts ""
+    file.puts "desrcibe \"" + table.name.titleize + "\" do"
+    file.puts ""
+
+    #Context loop for each field
+    table.fields.each do |f|
+      file.puts "\tcontext \"" + f.name + " property\" do"
+    end
+    file.puts ""
+
+    #End
+    file.puts "end"
+  end
+
+
+  ###########################################################################
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_table

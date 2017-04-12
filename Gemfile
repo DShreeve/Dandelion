@@ -32,6 +32,8 @@ gem 'factory_girl_rails'
 # https://github.com/ctran/annotate_models
 gem 'annotate', '~> 2.7', '>= 2.7.1'
 
+
+gem 'regexp-examples'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

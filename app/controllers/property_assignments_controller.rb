@@ -3,6 +3,7 @@ class PropertyAssignmentsController < ApplicationController
   before_action :get_table
   before_action :get_field
   before_action :set_property_assignment, only: [:show, :edit, :update, :destroy]
+  before_action :get_properties, only: [:new, :edit]
 
   # GET /property_assignments
   # GET /property_assignments.json
@@ -85,5 +86,9 @@ class PropertyAssignmentsController < ApplicationController
 
     def get_field
       @field = @table.fields.find(params[:field_id])
+    end
+
+    def get_properties
+      @properties = Property.all
     end
 end

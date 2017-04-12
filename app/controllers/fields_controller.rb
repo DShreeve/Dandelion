@@ -2,6 +2,7 @@ class FieldsController < ApplicationController
   before_action :get_project
   before_action :get_table
   before_action :set_field, only: [:show, :edit, :update, :destroy]
+  before_action :get_data_types, only: [:new, :edit]
 
   # GET /fields
   # GET /fields.json
@@ -80,6 +81,10 @@ class FieldsController < ApplicationController
 
     def get_table
       @table = @project.tables.find(params[:table_id])
+    end
+
+    def get_data_types
+      @data_types = DataType.all
     end
 
 
