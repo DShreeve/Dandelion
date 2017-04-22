@@ -136,6 +136,62 @@ class TablesController < ApplicationController
   end
 
 
+  def generate_value_pair_integer (isolated, rest)
+
+    for full_iteration in 0..50
+      numbers = gen_rand_int_array(50000)
+      if isolated != nil
+        numbers = fail_int_rule(numbers, isolated[0], isolated[1])
+        if numbers.empty?
+          next
+        end
+      end
+      if rest.empty?
+        return numbers.sample
+      else
+        rest.each do |rule|
+          numbers = pass_int_rule(numbers, rule[0], rule[1])
+          if numbers.empty?
+            break
+          end
+        end
+        if numbers.empty?
+          next
+        else
+          return numbers.sample
+        end
+      end
+    end
+
+    return false
+
+  end
+
+  def pass_int_rule( numbers, rule, value)
+    if rule == "divisible"
+      return numbers.keep_if{ |n| n % value == 0}
+    else
+      return numbers.keep_if{ |n| n.method(rule).(value)}
+    end
+  end
+
+  def fail_int_rule( numbers, rule, value)
+    if rule == "divisible"
+      return numbers.delete_if{ |n| n % value == 0}
+    else
+      return numbers.delete_if{ |n| n.method(rule).(value)}
+    end
+  end
+
+
+
+
+
+  def gen_rand_int_array(amount)
+    array = amount.times.map{ Random.rand(-1000000000 .. 1000000000)}
+    return array
+  end
+
   ###########################################################################
 
   private
