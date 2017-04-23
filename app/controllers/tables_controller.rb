@@ -69,23 +69,37 @@ class TablesController < ApplicationController
     fileName = table.name.downcase + "_spec.rb"
     file = File.open( fileName, "w")
 
-    #Start
+    # Introduction/Set-up file
     file.puts "require \"spec_helper\""
     file.puts ""
     file.puts "desrcibe \"" + table.name.titleize + "\" do"
     file.puts ""
     file << factory(table.name)
-    #Context loop for each field
-    table.fields.each do |f|
-      file.puts "\tdescribe \"" + f.name + " field has property\" do"
-      file.puts ""
-      f.property_assignments.each do |p|
-        file.puts "\t\tcontext \"" + Property.find(p.property_id).name + " " + p.value.value + "\" do"
-        file << (property_write(table.name.downcase, f.name,"<@valid>", "<@in_valid>", Property.find(p.property_id).rule,p.value.value))
-        file.puts "\t\tend"
-        file.puts ""
-      end
 
+    #Context loop for each field
+
+    table.fields.each do |f|
+      if f.property_assignments.empty?
+        next
+      else
+        file.puts "\tdescribe \"" + f.name + " field has property\" do"
+        file.puts ""
+        properties = package_properties(p)
+        if rules_contain( "blank", properties)
+          file << blank_rule(bool)
+        end
+        if rules_contain( "inclusion", properties )
+          #the stuff
+          next
+        end
+        f.property_assignments.each do |p|
+          
+          file.puts "\t\tcontext \"" + Property.find(p.property_id).name + " " + p.value.value + "\" do"
+          file << (property_write(table.name.downcase, f.name,"<@valid>", "<@in_valid>", Property.find(p.property_id).rule,p.value.value))
+          file.puts "\t\tend"
+          file.puts ""
+        end
+      end
       file.puts "\tend"
       file.puts ""
     end
@@ -94,6 +108,39 @@ class TablesController < ApplicationController
 
     file.puts "end"
     file.close
+  end
+
+  def package_properties(assignments)
+    if assignments.empty?
+      return []
+    else
+      rules = []
+      assignments.each do |a|
+        property = Property.find(a.property_id)
+        value = property.value
+        dataType = DataType.find(value.data_type_id)
+        rules << [property.rule, value.value, dataType]
+      end
+      return rules
+    end
+  end
+
+  def rules_contain(rule, rules)
+    if rules.empty
+      return false
+    else
+      rules.each do |r|
+        if r[0] == rule
+          return true
+        end
+      return false
+  end
+
+  def rules_index_of(rule, rules)
+    rules.each_with_index do | r , i |
+      if r[0] == rule
+        return i
+      end
   end
 
   def factory(name)
@@ -107,11 +154,6 @@ class TablesController < ApplicationController
   def property_write(table,field, gen_v, gen_iv, rule, chosen)
     tab = "\t"
     n = "\n"
-
-    value_intro = tab*3 + "it \"generated a correct valid value\" do"
-    value_main = tab*4 + "expect(" + gen_v +").to be " + rule + " " + chosen
-    value_end = tab*3 + "end"
-    value_whole = value_intro + n + value_main + n + value_end + n
 
     valid_intro = tab*3 + "it \"is valid with generated value\" do"
     valid_main_1 = tab*4 + table + " = build(:" + table + "," + field + ": " + gen_v + ")"
@@ -132,17 +174,21 @@ class TablesController < ApplicationController
     in_valid_end = tab*4 + "end" + n + tab*3 + "end"
     in_valid_whole = in_valid_intro + n + in_valid_main_1 + n + in_valid_main_2 + n + in_valid_main_3 + n + in_valid_end + n 
 
-    return value_whole +  valid_whole + in_value_whole + in_valid_whole 
+    return   valid_whole + in_value_whole + in_valid_whole 
   end
 
 
   def generate_value_pair_integer (isolated, rest)
 
-    for full_iteration in 0..50
-      numbers = gen_rand_int_array(50000)
+    for full_iteration in 1..50
+      numbers = gen_rand_int_array(50000) #inefficent but more readable to replace when exclusion
       if isolated != nil
-        numbers = fail_int_rule(numbers, isolated[0], isolated[1])
-        if numbers.empty?
+        if isolated[0] == "exclusion"
+          numbers = int_rule_string_value_helper(isolated[1])
+        else
+          numbers = fail_int_rule(numbers, isolated[0], isolated[1])
+        end
+        if numbers.empty? #empty exclusion is fucked
           next
         end
       end
@@ -170,6 +216,9 @@ class TablesController < ApplicationController
   def pass_int_rule( numbers, rule, value)
     if rule == "divisible"
       return numbers.keep_if{ |n| n % value == 0}
+    elsif rule == "exclusion"
+      excluded = int_rule_string_value_helper(value)
+      return numbers.delete_if{ |n| excluded.include?(n)}
     else
       return numbers.keep_if{ |n| n.method(rule).(value)}
     end
@@ -183,12 +232,43 @@ class TablesController < ApplicationController
     end
   end
 
+  # Converts string value from database to array
+  def int_rule_string_value_helper(string)
+    return array = string.split(",").map{ |s| s.to_i}
+  end
 
-
-
+  def contains_inclusion( array)
+    if array.empty?
+      return false
+    elsif array.all? { |e| e.kind_of? Array}
+      array.each do |rule|
+        if rule[0] == "inclusion"
+          return true
+        end
+      end
+      return false
+    elsif array[0] == "inclusion"
+      return true
+    else
+      return false
+    end
+  end
 
   def gen_rand_int_array(amount)
     array = amount.times.map{ Random.rand(-1000000000 .. 1000000000)}
+    return array
+  end
+
+
+  def gen_rand_string(regex, a, b, c)
+    return regex.examples(max_repeater_variance: a , max_group_results: b, max_results_limit: c)
+  end
+
+  def gen_rand_string2(regex, a, b, c)
+    array = []
+    for i in 0..5
+      array << regex.random_example(max_repeater_variance: a)
+    end
     return array
   end
 

@@ -16,21 +16,37 @@ data_types.each do |name, desc|
   DataType.create( name: name, description: desc)
 end
 
-properties = [
-  ["Greater than", "Value must be greater than value specified", ">",  1,  1],
-  ["Greater than or equal to", "Value must be greater than or equal to value specified", ">=",  1,  1],
-  ["Equal to", "Value must be equal to value specified", "==",  1,  1],
-  ["Less than or equal to", "Value must be less than or equal to value specified", "<=",  1,  1],
-  ["Less than", "Value must be less than value specified", "<",  1,  1],
-  ["Other than", "Value must be a value that is not value specified", "!=",  1,  1],
-  ["Is odd", "Value must be odd", "%2 = 1",  1,  3],
-  ["Is even", "Value must be even", "%2 = 0",  1,  3]
+int_properties = [
+  ["Greater than", "Integer must be greater than Integer specified", ">",  1,  1],
+  ["Greater than or equal to", "Integer must be greater than or equal to Integer specified", ">=",  1,  1],
+  ["Equal to", "Integer must be equal to Integer specified", "==",  1,  1],
+  ["Less than or equal to", "Integer must be less than or equal to value specified", "<=",  1,  1],
+  ["Less than", "Integer must be less than value specified", "<",  1,  1],
+  ["Other than", "Integer must be a value that is not value specified", "!=",  1,  1],
+  ["Divisible", "Integer must be divisible by given Integer", "divisible",  1,  1],
+  ["Exclusion", "Integer in list will not be accepted", "exclusion", 1, 1],
+  ["Inclusion", "Integer in list will ONLY be accpeted", "inclusion", 1,1],
+  ["Blank", "Field can be left blank/nil", "blank", 1, 3]
 
 ]
 
-properties.each do |name, desc, rule, field_data_type, value_data_type|
+int_properties.each do |name, desc, rule, field_data_type, value_data_type|
   Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
 end
+
+string_properties = [
+  ["Exclusion", "String in list will not be accepted", "exclusion", 2, 2],
+  ["Inclusion", "String in list will ONLY be accpeted", "inclusion", 2,2],
+  ["Format", "String must match regex to be accepted","regex", 2, 2],
+  ["Minimum Length", "String must exceed length given", "min_length", 2, 1],
+  ["Maximum Length", "String must not exceed length given", "max_length", 2, 1],
+  ["Exact Length", "String must be of length given", "exact_length", 2, 1],
+  ["Blank", "Field can be left blank/nil", "blank", 2, 3]
+
+
+]
+
+
 
 project = Project.create( name: "Test Project", description: "A Project for testing")
 
