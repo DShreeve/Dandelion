@@ -89,6 +89,6 @@ class PropertyAssignmentsController < ApplicationController
     end
 
     def get_properties
-      @properties = Property.all
+      @properties = Property.where(field_data_type_id: @field.data_type_id)
     end
 end

@@ -4,6 +4,7 @@ class ValuesController < ApplicationController
   before_action :get_field
   before_action :get_property_assignment
   before_action :set_value, only: [:show, :edit, :update, :destroy]
+  before_action :get_value_data_type, only: [ :new, :edit]
 
   # GET /values
   # GET /values.json
@@ -28,7 +29,7 @@ class ValuesController < ApplicationController
   # POST /values.json
   def create
     @value = @property_assignment.build_value(value_params)
-
+    @value.data_type_id =  DataType.find(@property_assignment.property.value_data_type_id).id
     respond_to do |format|
       if @value.save
         format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Value was successfully created.' }
@@ -72,7 +73,8 @@ class ValuesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def value_params
-      params.require(:value).permit(:value, :data_type_id)
+      params.require(:value).permit(:value)
+      
     end
 
     def get_project
@@ -90,5 +92,9 @@ class ValuesController < ApplicationController
     def get_property_assignment
       @property_assignment = @field.property_assignments.find(params[:property_assignment_id])
       
+    end
+
+    def get_value_data_type
+      @value_data_type = DataType.find(@property_assignment.property.value_data_type_id).name
     end
 end

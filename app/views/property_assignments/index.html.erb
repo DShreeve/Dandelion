@@ -14,7 +14,7 @@
   <tbody>
     <% @property_assignments.each do |property_assignment| %>
       <tr>
-        <td><%= property_assignment.property_id %></td>
+        <td><%= Property.find(property_assignment.property_id).name %></td>
         
         <% if property_assignment.value == nil %>
           <td>no value</td>

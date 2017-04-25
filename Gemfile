@@ -31,7 +31,7 @@ gem 'database_cleaner'
 gem 'factory_girl_rails'
 # https://github.com/ctran/annotate_models
 gem 'annotate', '~> 2.7', '>= 2.7.1'
-
+gem 'to_regexp', '~> 0.2.1'
 
 gem 'regexp-examples'
 # Use ActiveModel has_secure_password

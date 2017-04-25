@@ -10,6 +10,7 @@ data_types = [
   ["Integer","Integer data type"], #1
   ["String","String data type"], #2
   ["Boolean","Boolean data type"], #3
+  ["Float", "Float data type"] #4
 ]
 
 data_types.each do |name, desc|
@@ -24,8 +25,8 @@ int_properties = [
   ["Less than", "Integer must be less than value specified", "<",  1,  1],
   ["Other than", "Integer must be a value that is not value specified", "!=",  1,  1],
   ["Divisible", "Integer must be divisible by given Integer", "divisible",  1,  1],
-  ["Exclusion", "Integer in list will not be accepted", "exclusion", 1, 1],
-  ["Inclusion", "Integer in list will ONLY be accpeted", "inclusion", 1,1],
+  ["Exclusion", "Integer in list will not be accepted", "exclusion", 1, 2],
+  ["Inclusion", "Integer in list will ONLY be accpeted", "inclusion", 1,2],
   ["Blank", "Field can be left blank/nil", "blank", 1, 3]
 
 ]
@@ -34,17 +35,39 @@ int_properties.each do |name, desc, rule, field_data_type, value_data_type|
   Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
 end
 
+float_properties = [
+  ["Greater than", "Float must be greater than Float specified", ">",  4,  4],
+  ["Greater than or equal to", "Float must be greater than or equal to Float specified", ">=",  4,  4],
+  ["Equal to", "Float must be equal to Float specified", "==",  4,  4],
+  ["Less than or equal to", "Float must be less than or equal to value specified", "<=",  1,  4],
+  ["Less than", "Float must be less than value specified", "<",  4,  4],
+  ["Other than", "Float must be a value that is not value specified", "!=",  4,  4],
+  ["Divisible", "Float must be divisible by given Float", "divisible",  4,  4],
+  ["Exclusion", "Float in list will not be accepted", "exclusion", 4, 2],
+  ["Inclusion", "Float in list will ONLY be accpeted", "inclusion", 4,2],
+  ["Blank", "Field can be left blank/nil", "blank", 4, 3]
+
+]
+
+float_properties.each do |name, desc, rule, field_data_type, value_data_type|
+  Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
+end
+
 string_properties = [
   ["Exclusion", "String in list will not be accepted", "exclusion", 2, 2],
   ["Inclusion", "String in list will ONLY be accpeted", "inclusion", 2,2],
   ["Format", "String must match regex to be accepted","regex", 2, 2],
-  ["Minimum Length", "String must exceed length given", "min_length", 2, 1],
-  ["Maximum Length", "String must not exceed length given", "max_length", 2, 1],
-  ["Exact Length", "String must be of length given", "exact_length", 2, 1],
+  ["Minimum Length", "String must exceed length given", ">", 2, 1],
+  ["Maximum Length", "String must not exceed length given", "<", 2, 1],
+  ["Exact Length", "String must be of length given", "==", 2, 1],
   ["Blank", "Field can be left blank/nil", "blank", 2, 3]
 
 
 ]
+
+string_properties.each do |name, desc, rule, field_data_type, value_data_type|
+  Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
+end
 
 
 

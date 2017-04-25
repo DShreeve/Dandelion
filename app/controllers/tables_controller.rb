@@ -63,39 +63,89 @@ class TablesController < ApplicationController
   end
 
   ###########################################################################
-
-  def write_test(id)
+  # TablesController.new.generate_tests_for_table(1)
+  def generate_tests_for_table(id)
     table = Table.find(id)
     fileName = table.name.downcase + "_spec.rb"
-    file = File.open( fileName, "w")
-
+    file = File.open(fileName, "w")
+    
     # Introduction/Set-up file
     file.puts "require \"spec_helper\""
     file.puts ""
     file.puts "desrcibe \"" + table.name.titleize + "\" do"
     file.puts ""
-    file << factory(table.name)
+    file << write_factory_test(table.name, 1)
 
     #Context loop for each field
-
+    # Hash stores variables to populate test templates
+    hash = { tableName: table.name.downcase}
     table.fields.each do |f|
+      hash[:fieldName] = f.name
       if f.property_assignments.empty?
-        next
+        next 
       else
         file.puts "\tdescribe \"" + f.name + " field has property\" do"
         file.puts ""
-        properties = package_properties(p)
-        if rules_contain( "blank", properties)
-          file << blank_rule(bool)
+        properties = package_properties(f.property_assignments)
+        if properties_contain?("blank", properties)
+          index = properties_index_of("blank", properties)
+          if properties[index][1] == "true"
+            file << blank_test(hash, true, 2)
+          else
+            file << blank_test(hash, false, 2)
+          end
+          # Remove blank from properties, fully handled
+          properties.delete_at(index)
+          hash.delete(:decision)
+          hash.delete(:equator)
         end
-        if rules_contain( "inclusion", properties )
-          #the stuff
-          next
+        if properties_contain?("inclusion", properties)
+          index = properties_index_of("inclusion", properties)
+          if DataType.find(f.data_type_id).name == "String"
+            stringArray = properties[index][1].split(",").map(&:strip)
+            file << string_inclusion(hash, stringArray)
+          else
+            numberArray = database_string_to_number_array(properties[index][1])
+            file << number_inclusion(hash, numberArray)
+          end
+          next # Inclusion supercedes remaining properties, skip to next
         end
-        f.property_assignments.each do |p|
-          
-          file.puts "\t\tcontext \"" + Property.find(p.property_id).name + " " + p.value.value + "\" do"
-          file << (property_write(table.name.downcase, f.name,"<@valid>", "<@in_valid>", Property.find(p.property_id).rule,p.value.value))
+        # test with all properties valid
+        file.puts "\t\tit \"is valid with a generated value\" do\n"
+        if DataType.find(f.data_type_id).name == "String"          
+          value = generate_string_value(nil, properties)
+          hash[:generatedValue] = value
+          file << test_text(true, hash, 3)
+        else
+          value = 0
+          if DataType.find(f.data_type_id).name == "Float"
+            value = generate_value_integer(nil, properties, "Float")
+          elsif DataType.find(f.data_type_id).name == "Integer"
+            value = generate_value_integer(nil, properties, "Integer")
+          end
+          hash[:generatedValue] = value
+          file << test_text(true, hash, 3)
+        end
+        # Write test isolating each property to be invalid
+        properties.each do |p|
+          # Array we can manipulate
+          rest = [].replace(properties)
+          rest.delete_if{ |e| e == p} # remove isolated rule
+          file.puts "\t\tit \"is invalid with value " + p[0].to_s + " " + p[1].to_s + "\" do"
+          if DataType.find(f.data_type_id).name == "String"
+            value = generate_string_value(p, rest)
+            hash[:generatedValue] = value
+            file << test_text(false, hash, 3)
+          else
+            value = 0
+            if DataType.find(f.data_type_id).name == "Float"
+              value = generate_value_integer(nil, properties, "Float")
+            elsif DataType.find(f.data_type_id).name == "Integer"
+              value = generate_value_integer(nil, properties, "Integer")
+            end
+            hash[:generatedValue] = value
+            file << test_text(false, hash, 3)
+          end
           file.puts "\t\tend"
           file.puts ""
         end
@@ -103,9 +153,6 @@ class TablesController < ApplicationController
       file.puts "\tend"
       file.puts ""
     end
-
-    #End
-
     file.puts "end"
     file.close
   end
@@ -117,157 +164,308 @@ class TablesController < ApplicationController
       rules = []
       assignments.each do |a|
         property = Property.find(a.property_id)
-        value = property.value
-        dataType = DataType.find(value.data_type_id)
-        rules << [property.rule, value.value, dataType]
+        value = a.value.value
+        rules << [property.rule, value]
       end
       return rules
     end
   end
 
-  def rules_contain(rule, rules)
-    if rules.empty
+  def blank_test(hash, bool, indent)
+    tab = "\t" #Add initial indent
+    template = tab*indent + "it \"%{decision} be blank\" do \n" +
+               tab*(indent+1) + "%{tableName} = build(:%{tableName}, %{fieldName}: nil)\n" +
+               tab*(indent+1) + "if %{tableName}.respond_to?(:valid?)\n" +
+               tab*(indent+2) + "expect(%{tableName}).%{equator} be_valid, lambda {%{tableName}.errors.full_messages.join(\"\\n\")}\n" +
+               tab*(indent+1) + "end\n" +
+               tab*indent + "end\n\n"
+    if bool
+      hash[:decision] = "can"
+      hash[:equator] = "to"
+    else
+      hash[:decision] = "can not"
+      hash[:equator] = "to_not"
+    end    
+    return template % hash
+  end
+  # GORDON, better to loop after or before check ?
+  def number_inclusion(hash, includedValues)
+    correctValue = includedValues.sample
+    incorrectValue = 0
+    if correctValue.is_a? Float
+      for i in 1..50
+        numbers = gen_rand_float_array
+        numbers.delete_if{ |n| includedValues.include?(n) }
+        if numbers.empty?
+          next
+        else
+          incorrectValue = numbers.sample
+          break
+        end
+      end
+    else
+      for i in 1..50
+        numbers = gen_rand_int_array
+        numbers.delete_if{ |n| includedValues.include?(n) }
+        if numbers.empty?
+          next
+        else
+          incorrectValue = numbers.sample
+          break
+        end
+      end
+    end
+    hash[:generatedValue] = correctValue
+    correctTestText = test_text(true,hash,3)
+    hash[:generatedValue] = incorrectValue
+    inCorrectTestText = test_text(false,hash,3)
+    correct_intro = "\t\tit \"is valid with a value from inclusion\" do\n"
+    incorrect_intro = "\t\tit \"is invalid with a value not in inclusion\" do\n"
+    return correct_intro + correctTestText + incorrect_intro + inCorrectTestText 
+  end
+
+  def string_inclusion(hash, includedValues)
+    correctValue = prep_string(includedValues.sample)
+    incorrectValue = ""
+    regexp = [/\A[a-zA-Z]*[a-zA-Z]*\z/, /\A[\w]*[\w]*\z/, /\A[\w]*[[:punct:]]*[\w]*\z/, /\A[\w]*[[:print:]]*[a-zA-Z]*\z/]
+    strings = []
+    for i in 1..50
+      regexp.each do |r|
+        strings += gen_rand_string_array(r, (1000/regexp.length))
+      end
+      strings.delete_if{ |n| includedValues.include?(n) }
+      if strings.empty?
+        next
+      else
+        incorrectValue = prep_string(strings.sample)
+        break
+      end
+    end
+    hash[:generatedValue] = correctValue
+    correctTestText = test_text(true, hash, 3)
+    hash[:generatedValue] = incorrectValue
+    inCorrectTestText = test_text(false, hash, 3)
+    correct_intro = "\t\tit \"is valid with a value from inclusion\" do\n"
+    incorrect_intro = "\t\tit \"is invalid with a value not in inclusion\" do\n"
+    return correct_intro + correctTestText + incorrect_intro + inCorrectTestText 
+  end
+
+  def properties_contain?(rule, rules)
+    if rules.empty?
       return false
     else
       rules.each do |r|
         if r[0] == rule
           return true
         end
+      end
       return false
+    end
   end
 
-  def rules_index_of(rule, rules)
+  def properties_index_of(rule, rules)
     rules.each_with_index do | r , i |
       if r[0] == rule
         return i
       end
+    end
   end
 
-  def factory(name)
+  def write_factory_test(name, indent)
     tab = "\t"
-    intro = tab*1 + "it \"has a valid factory\" do"
-    main = tab*2 + "expect(build(:" + name.downcase + ")).to be_valid"
-    last = tab*1 + "end"
-    return intro + "\n" + main + "\n" +last +"\n\n"
+    template = tab*indent + "it \"has a valid factory\" do\n" +
+               tab*(indent+1) + "expect(build(:" + name.downcase + ")).to be_valid\n" +
+               tab*indent + "end\n\n"
+    return template 
   end
 
-  def property_write(table,field, gen_v, gen_iv, rule, chosen)
+  # GORDON - better on one line (3rd line template)
+  def test_text(beValid,hash, indent)
     tab = "\t"
-    n = "\n"
-
-    valid_intro = tab*3 + "it \"is valid with generated value\" do"
-    valid_main_1 = tab*4 + table + " = build(:" + table + "," + field + ": " + gen_v + ")"
-    valid_main_2 = tab*4 + "if " + table + ".respond_to?(:valid?)"
-    valid_main_3 = tab*5 + "expect(" + table + ").to be_valid, lambda { " + table + ".errors.full_messages.join(\"\\n\") }"
-    valid_end = tab*4 + "end" + n + tab*3 + "end"
-    valid_whole = valid_intro + n + valid_main_1 + n + valid_main_2 + n + valid_main_3 + n + valid_end + n 
-
-    in_value_intro = tab*3 + "it \"generated a correct invalid value\" do"
-    in_value_main = tab*4 + "expect(" + gen_iv +").to_not be " + rule + " " + chosen
-    in_value_end = tab*3 + "end"
-    in_value_whole = in_value_intro + n + in_value_main + n + in_value_end + n
-
-    in_valid_intro = tab*3 + "it \"is invalid with generated value\" do"
-    in_valid_main_1 = tab*4 + table + " = build(:" + table + "," + field + ": " + gen_iv + ")"
-    in_valid_main_2 = tab*4 + "if " + table + ".respond_to?(:valid?)"
-    in_valid_main_3 = tab*5 + "expect(" + table + ").to_not be_valid, lambda { " + table + ".errors.full_messages.join(\"\\n\") }"
-    in_valid_end = tab*4 + "end" + n + tab*3 + "end"
-    in_valid_whole = in_valid_intro + n + in_valid_main_1 + n + in_valid_main_2 + n + in_valid_main_3 + n + in_valid_end + n 
-
-    return   valid_whole + in_value_whole + in_valid_whole 
+    if beValid
+      hash[:valid] = "to"
+    else
+      hash[:valid] = "to_not"
+    end
+    template = tab*indent + "%{tableName} = build(:%{tableName}, %{fieldName}: %{generatedValue})\n" +
+               tab*indent + "if %{tableName}.respond_to?(:valid?)\n" +
+               tab*(indent+1) + "expect(%{tableName}).%{valid} be_valid, lambda {%{tableName}.errors.full_messages.join(\"\\n\")}\n" +
+               tab*indent + "end\n" 
+    return template % hash
   end
 
 
-  def generate_value_pair_integer (isolated, rest)
-
-    for full_iteration in 1..50
-      numbers = gen_rand_int_array(50000) #inefficent but more readable to replace when exclusion
-      if isolated != nil
-        if isolated[0] == "exclusion"
-          numbers = int_rule_string_value_helper(isolated[1])
-        else
-          numbers = fail_int_rule(numbers, isolated[0], isolated[1])
-        end
-        if numbers.empty? #empty exclusion is fucked
-          next
-        end
-      end
-      if rest.empty?
-        return numbers.sample
+  def generate_value_integer (isolated, rest , type)    
+    # isolated can be passed as nil to generate a pass all
+    # Begin generation loop
+    for iteration in 1..50
+      numbers = []
+      # inefficent when isolated is exculsion, but clearer structure
+      # also very minute efficency loss
+      if type == "Integer"
+        numbers = gen_rand_int_array(50000) 
       else
-        rest.each do |rule|
-          numbers = pass_int_rule(numbers, rule[0], rule[1])
-          if numbers.empty?
-            break
+        numbers = gen_rand_float_array(50000)
+      end
+      if isolated != nil
+        # If testing exclusion then return one of its values 
+        if isolated[0] == "exclusion"
+          return  database_string_to_number_array(isolated[1]).sample 
+        else
+          numbers = fail_num_rule(numbers, isolated[0], isolated[1])
+          if numbers.empty? 
+            next
           end
         end
+      end            
+      rest.each do |rule|
+        numbers = pass_num_rule(numbers, rule[0], rule[1])
         if numbers.empty?
-          next
-        else
-          return numbers.sample
+          break
         end
       end
+      if numbers.empty?
+        next
+      else
+        return numbers.sample
+      end
     end
-
-    return false
-
+    # No valid value generated
+    return "\"!!!ERROR GENERATING VALUE\""
   end
 
-  def pass_int_rule( numbers, rule, value)
+  def prep_string(string)
+    # Add speech marks and escape \ " within to be written safely to test file
+    return "\"" + string.gsub(/[\"\\]/){ |c| "\\"+c } + "\""
+  end
+
+  def generate_string_value(isolated, rest)
+    # isolated can be passed as nil to generate a pass all
+    # default regexp to generate strings
+    regexp = [/\A[a-zA-Z]*[a-zA-Z]*\z/, /\A[\w]*[\w]*\z/, /\A[\w]*[[:punct:]]*[\w]*\z/, /\A[\w]*[[:print:]]*[a-zA-Z]*\z/]
+    # Add users regexp to the defaults if in rest
+    if !rest.empty?
+        if properties_contain?("format", rest)
+          index = properties_index_of("format", rest)
+          regexp << rest[index][1].to_regexp
+        end
+    end
+    # Begin generation loop
+    for full_iteration in 1..50
+      strings = []
+      # If testing exclusion then return one of its values 
+      if (isolated != nil) && (isolated[0] == "exclusion")
+        return prep_string(isolated[1].split(",").map(&:strip).sample) 
+      else
+        regexp.each do |r|
+          strings += gen_rand_string_array(r, (1000/regexp.length))
+        end
+      end
+      if isolated != nil
+        strings = fail_string_rule(strings, isolated[0], isolated[1])
+        if strings.empty?
+          next
+        end
+      end
+      rest.each do |rule|
+        strings = pass_string_rule(strings, rule[0], rule[1])
+        if strings.empty?
+          break
+        end
+      end
+      if strings.empty?
+        next
+      else
+        # Prefix and Suffix speech marks and esacpe '/'' and '"' for writing to file
+        return prep_string(strings.sample)
+      end     
+    end
+    # No valid value generated
+    return "\"!!!ERROR GENERATING VALUE\""
+  end
+
+  def pass_num_rule( numbers, rule, value)
+    if rule == "exclusion"
+      excluded = database_string_to_number_array(value)
+      return numbers.delete_if{ |n| excluded.include?(n) }
+    end
+    if numbers[0].is_a? Integer
+      value = value.to_i
+    else
+      value = value.to_f
+    end
     if rule == "divisible"
       return numbers.keep_if{ |n| n % value == 0}
-    elsif rule == "exclusion"
-      excluded = int_rule_string_value_helper(value)
-      return numbers.delete_if{ |n| excluded.include?(n)}
-    else
-      return numbers.keep_if{ |n| n.method(rule).(value)}
+    else # ASSUMED: Only >,>=,<,<= properties can progress to here
+      # Comparorator stored as string in database e.g ">"
+      return numbers.keep_if{ |n| n.method(rule).(value) }
     end
   end
 
-  def fail_int_rule( numbers, rule, value)
+  def fail_num_rule( numbers, rule, value)
+    if numbers[0].is_a? Integer
+      value = value.to_i
+    else
+      value = value.to_f
+    end
     if rule == "divisible"
-      return numbers.delete_if{ |n| n % value == 0}
-    else
-      return numbers.delete_if{ |n| n.method(rule).(value)}
+      return numbers.delete_if{ |n| n % value == 0 }
+    else # ASSUMED: Only >,>=,<,<= properties can progress to here
+      # Comparorator stored as string in database e.g ">"
+      return numbers.delete_if{ |n| n.method(rule).(value) }
     end
   end
 
-  # Converts string value from database to array
-  def int_rule_string_value_helper(string)
-    return array = string.split(",").map{ |s| s.to_i}
+  def pass_string_rule( strings, rule, value )
+    if rule == "regex"
+      regex = value.to_regexp
+      return strings.keep_if{ |n| n =~ regex } # =~ , ""[regex] , "".match(regex) #ATTN TIMINGS
+    elsif rule == "exclusion"
+      excluded = value.split(",").map(&:strip)
+      return strings.delete_if{ |n| excluded.include?(n)}
+    else # ASSUMED: Only length properties can progress to here
+      # Comparorator stored as string in database e.g ">"
+      return strings.keep_if{ |n| n.length.method(rule).(value.to_i)}
+    end
   end
 
-  def contains_inclusion( array)
-    if array.empty?
-      return false
-    elsif array.all? { |e| e.kind_of? Array}
-      array.each do |rule|
-        if rule[0] == "inclusion"
-          return true
-        end
-      end
-      return false
-    elsif array[0] == "inclusion"
-      return true
+  def fail_string_rule(strings, rule, value )
+    if rule == "regex"
+      regex = value.to_regexp
+      return strings.delete_if{ |n| n =~ regex }
+    else # ASSUMED: Only length properties can progress to here
+      # Comparorator stored as string in database e.g ">"
+      return strings.delete_if{ |n| n.length.method(rule).(value.to_i)}
+    end
+  end
+
+  # Converts string of values from database to array
+  def database_string_to_number_array(string)
+    if string.include? "."
+      return string.split(",").map{ |s| s.to_f } #Float
     else
-      return false
+      return string.split(",").map{ |s| s.to_i } #Integer
     end
   end
 
   def gen_rand_int_array(amount)
-    array = amount.times.map{ Random.rand(-1000000000 .. 1000000000)}
+    array = amount.times.map{Random.rand(-1000000 .. 1000000)}
     return array
   end
 
-
-  def gen_rand_string(regex, a, b, c)
-    return regex.examples(max_repeater_variance: a , max_group_results: b, max_results_limit: c)
+  def gen_rand_float_array(amount)
+    array = amount.times.map{Random.rand(-1000000.0 .. 1000000.0)}
+    return array
   end
 
-  def gen_rand_string2(regex, a, b, c)
+  def gen_rand_string_array(regex, amount)
     array = []
-    for i in 0..5
-      array << regex.random_example(max_repeater_variance: a)
+    # Generate amount specified as generated empty strings are deleted
+    while array.length < amount
+      string = regex.random_example(max_repeater_variance: 50)
+      if string != ""
+        array << string
+      end
     end
     return array
   end

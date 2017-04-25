@@ -17,7 +17,7 @@ class Property < ActiveRecord::Base
   has_many :fields, through: :property_assignments, inverse_of: :field_id
 
   validates :name, format: {with: /\A[A-Z].*\Z/, message: "Must start with capital letter"},
-    presence: true, uniqueness: true
+    presence: true, uniqueness: {scope: :field_data_type_id} 
 
   validates :field_data_type_id, presence: :true
 
