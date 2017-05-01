@@ -25,7 +25,6 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'rspec'
 gem 'rspec-rails'
-
 gem 'database_cleaner'
 
 gem 'factory_girl_rails'

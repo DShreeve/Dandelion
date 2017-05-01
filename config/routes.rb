@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   resources :properties
   resources :data_types
 
+  #Button for generating tests
+  post "tables/download/:project_id/:id" => "tables#download"
   #new
   get 'projects/new' => 'projects#new'
   get 'projects/:project_id/tables/new' => 'tables#new'

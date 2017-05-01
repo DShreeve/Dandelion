@@ -1,4 +1,4 @@
-<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <%= @property_assignment.property_id %> > Assign Value</h1>
+<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <%= @property.name %> > <u>Assign Value</u></h1>
 
 <%= render 'form' %>
 <%= link_to 'Back', project_table_field_path(@project, @table, @field), class: "btn btn-default" %>

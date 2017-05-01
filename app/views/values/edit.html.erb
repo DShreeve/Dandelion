@@ -1,7 +1,5 @@
-<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <%= @property_assignment.property_id %> > Editing Value</h1>
+<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <%= @property.name %> > Editing Value</h1>
 
 <%= render 'form' %>
 
 <%= link_to 'Back', project_table_field_path(@project, @table, @field), class: "btn btn-default" %>
-
-<%= link_to 'Show', project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value), class: "btn btn-success" %>

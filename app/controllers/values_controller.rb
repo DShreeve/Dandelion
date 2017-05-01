@@ -5,6 +5,7 @@ class ValuesController < ApplicationController
   before_action :get_property_assignment
   before_action :set_value, only: [:show, :edit, :update, :destroy]
   before_action :get_value_data_type, only: [ :new, :edit]
+  before_action :get_property, only: [ :new, :edit]
 
   # GET /values
   # GET /values.json
@@ -91,9 +92,11 @@ class ValuesController < ApplicationController
 
     def get_property_assignment
       @property_assignment = @field.property_assignments.find(params[:property_assignment_id])
-      
     end
 
+    def get_property
+      @property =Property.find(@property_assignment.property_id)
+    end
     def get_value_data_type
       @value_data_type = DataType.find(@property_assignment.property.value_data_type_id).name
     end

@@ -1,6 +1,6 @@
 class TablesController < ApplicationController
   before_action :get_project
-  before_action :set_table, only: [:show, :edit, :update, :destroy]
+  before_action :set_table, only: [:show, :edit, :update, :destroy, :generate_tests_for_table]
   
   # GET /tables
   # GET /tables.json
@@ -65,10 +65,11 @@ class TablesController < ApplicationController
   ###########################################################################
   # TablesController.new.generate_tests_for_table(1)
   def generate_tests_for_table(id)
+
     table = Table.find(id)
     fileName = table.name.downcase + "_spec.rb"
-    file = File.open(fileName, "w")
-    
+    #file = File.open(fileName, "w")
+    file = Tempfile.new(fileName,'tmp')
     # Introduction/Set-up file
     file.puts "require \"spec_helper\""
     file.puts ""
@@ -155,8 +156,18 @@ class TablesController < ApplicationController
     end
     file.puts "end"
     file.close
+    
+    return file.path, fileName
+      
+    
+    #send_file file.path
+    #render nothing: true
   end
 
+  def download
+    file , name = generate_tests_for_table(params[:id])
+    send_file(file, :filename => name ,  type: "text/rb", :disposition => "attachment")
+  end
   def package_properties(assignments)
     if assignments.empty?
       return []
