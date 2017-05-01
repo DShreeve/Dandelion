@@ -82,55 +82,55 @@ class TablesController < ApplicationController
     hash = { tableName: table.name.downcase}
     table.fields.each do |f|
       hash[:fieldName] = f.name
-      if f.property_assignments.empty?
+      if f.validation_assignments.empty?
         next 
       else
-        file.puts "\tdescribe \"" + f.name + " field has property\" do"
+        file.puts "\tdescribe \"" + f.name + " field has validation\" do"
         file.puts ""
-        properties = package_properties(f.property_assignments)
-        if properties_contain?("blank", properties)
-          index = properties_index_of("blank", properties)
-          if properties[index][1] == "true"
+        validations = package_validations(f.validation_assignments)
+        if validations_contain?("blank", validations)
+          index = validations_index_of("blank", validations)
+          if validations[index][1] == "true"
             file << blank_test(hash, true, 2)
           else
             file << blank_test(hash, false, 2)
           end
-          # Remove blank from properties, fully handled
-          properties.delete_at(index)
+          # Remove blank from validations, fully handled
+          validations.delete_at(index)
           hash.delete(:decision)
           hash.delete(:equator)
         end
-        if properties_contain?("inclusion", properties)
-          index = properties_index_of("inclusion", properties)
+        if validations_contain?("inclusion", validations)
+          index = validations_index_of("inclusion", validations)
           if DataType.find(f.data_type_id).name == "String"
-            stringArray = properties[index][1].split(",").map(&:strip)
+            stringArray = validations[index][1].split(",").map(&:strip)
             file << string_inclusion(hash, stringArray)
           else
-            numberArray = database_string_to_number_array(properties[index][1])
+            numberArray = database_string_to_number_array(validations[index][1])
             file << number_inclusion(hash, numberArray)
           end
-          next # Inclusion supercedes remaining properties, skip to next
+          next # Inclusion supercedes remaining validations, skip to next
         end
-        # test with all properties valid
+        # test with all validations valid
         file.puts "\t\tit \"is valid with a generated value\" do\n"
         if DataType.find(f.data_type_id).name == "String"          
-          value = generate_string_value(nil, properties)
+          value = generate_string_value(nil, validations)
           hash[:generatedValue] = value
           file << test_text(true, hash, 3)
         else
           value = 0
           if DataType.find(f.data_type_id).name == "Float"
-            value = generate_value_integer(nil, properties, "Float")
+            value = generate_value_integer(nil, validations, "Float")
           elsif DataType.find(f.data_type_id).name == "Integer"
-            value = generate_value_integer(nil, properties, "Integer")
+            value = generate_value_integer(nil, validations, "Integer")
           end
           hash[:generatedValue] = value
           file << test_text(true, hash, 3)
         end
-        # Write test isolating each property to be invalid
-        properties.each do |p|
+        # Write test isolating each validation to be invalid
+        validations.each do |p|
           # Array we can manipulate
-          rest = [].replace(properties)
+          rest = [].replace(validations)
           rest.delete_if{ |e| e == p} # remove isolated rule
           file.puts "\t\tit \"is invalid with value " + p[0].to_s + " " + p[1].to_s + "\" do"
           if DataType.find(f.data_type_id).name == "String"
@@ -140,9 +140,9 @@ class TablesController < ApplicationController
           else
             value = 0
             if DataType.find(f.data_type_id).name == "Float"
-              value = generate_value_integer(nil, properties, "Float")
+              value = generate_value_integer(nil, validations, "Float")
             elsif DataType.find(f.data_type_id).name == "Integer"
-              value = generate_value_integer(nil, properties, "Integer")
+              value = generate_value_integer(nil, validations, "Integer")
             end
             hash[:generatedValue] = value
             file << test_text(false, hash, 3)
@@ -168,15 +168,15 @@ class TablesController < ApplicationController
     file , name = generate_tests_for_table(params[:id])
     send_file(file, :filename => name ,  type: "text/rb", :disposition => "attachment")
   end
-  def package_properties(assignments)
+  def package_validations(assignments)
     if assignments.empty?
       return []
     else
       rules = []
       assignments.each do |a|
-        property = Property.find(a.property_id)
+        validation = Validation.find(a.validation_id)
         value = a.value.value
-        rules << [property.rule, value]
+        rules << [validation.rule, value]
       end
       return rules
     end
@@ -261,7 +261,7 @@ class TablesController < ApplicationController
     return correct_intro + correctTestText + incorrect_intro + inCorrectTestText 
   end
 
-  def properties_contain?(rule, rules)
+  def validations_contain?(rule, rules)
     if rules.empty?
       return false
     else
@@ -274,7 +274,7 @@ class TablesController < ApplicationController
     end
   end
 
-  def properties_index_of(rule, rules)
+  def validations_index_of(rule, rules)
     rules.each_with_index do | r , i |
       if r[0] == rule
         return i
@@ -356,8 +356,8 @@ class TablesController < ApplicationController
     regexp = [/\A[a-zA-Z]*[a-zA-Z]*\z/, /\A[\w]*[\w]*\z/, /\A[\w]*[[:punct:]]*[\w]*\z/, /\A[\w]*[[:print:]]*[a-zA-Z]*\z/]
     # Add users regexp to the defaults if in rest
     if !rest.empty?
-        if properties_contain?("format", rest)
-          index = properties_index_of("format", rest)
+        if validations_contain?("format", rest)
+          index = validations_index_of("format", rest)
           regexp << rest[index][1].to_regexp
         end
     end
@@ -407,7 +407,7 @@ class TablesController < ApplicationController
     end
     if rule == "divisible"
       return numbers.keep_if{ |n| n % value == 0}
-    else # ASSUMED: Only >,>=,<,<= properties can progress to here
+    else # ASSUMED: Only >,>=,<,<= validations can progress to here
       # Comparorator stored as string in database e.g ">"
       return numbers.keep_if{ |n| n.method(rule).(value) }
     end
@@ -421,7 +421,7 @@ class TablesController < ApplicationController
     end
     if rule == "divisible"
       return numbers.delete_if{ |n| n % value == 0 }
-    else # ASSUMED: Only >,>=,<,<= properties can progress to here
+    else # ASSUMED: Only >,>=,<,<= validations can progress to here
       # Comparorator stored as string in database e.g ">"
       return numbers.delete_if{ |n| n.method(rule).(value) }
     end
@@ -434,7 +434,7 @@ class TablesController < ApplicationController
     elsif rule == "exclusion"
       excluded = value.split(",").map(&:strip)
       return strings.delete_if{ |n| excluded.include?(n)}
-    else # ASSUMED: Only length properties can progress to here
+    else # ASSUMED: Only length validations can progress to here
       # Comparorator stored as string in database e.g ">"
       return strings.keep_if{ |n| n.length.method(rule).(value.to_i)}
     end
@@ -444,7 +444,7 @@ class TablesController < ApplicationController
     if rule == "regex"
       regex = value.to_regexp
       return strings.delete_if{ |n| n =~ regex }
-    else # ASSUMED: Only length properties can progress to here
+    else # ASSUMED: Only length validations can progress to here
       # Comparorator stored as string in database e.g ">"
       return strings.delete_if{ |n| n.length.method(rule).(value.to_i)}
     end

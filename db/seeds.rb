@@ -17,7 +17,7 @@ data_types.each do |name, desc|
   DataType.create( name: name, description: desc)
 end
 
-int_properties = [
+int_validations = [
   ["Greater than", "Integer must be greater than Integer specified", ">",  1,  1],
   ["Greater than or equal to", "Integer must be greater than or equal to Integer specified", ">=",  1,  1],
   ["Equal to", "Integer must be equal to Integer specified", "==",  1,  1],
@@ -31,11 +31,11 @@ int_properties = [
 
 ]
 
-int_properties.each do |name, desc, rule, field_data_type, value_data_type|
-  Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
+int_validations.each do |name, desc, rule, field_data_type, value_data_type|
+  Validation.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
 end
 
-float_properties = [
+float_validations = [
   ["Greater than", "Float must be greater than Float specified", ">",  4,  4],
   ["Greater than or equal to", "Float must be greater than or equal to Float specified", ">=",  4,  4],
   ["Equal to", "Float must be equal to Float specified", "==",  4,  4],
@@ -49,11 +49,11 @@ float_properties = [
 
 ]
 
-float_properties.each do |name, desc, rule, field_data_type, value_data_type|
-  Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
+float_validations.each do |name, desc, rule, field_data_type, value_data_type|
+  Validation.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
 end
 
-string_properties = [
+string_validations = [
   ["Exclusion", "String in list will not be accepted", "exclusion", 2, 2],
   ["Inclusion", "String in list will ONLY be accpeted", "inclusion", 2,2],
   ["Format", "String must match regex to be accepted","regex", 2, 2],
@@ -65,8 +65,8 @@ string_properties = [
 
 ]
 
-string_properties.each do |name, desc, rule, field_data_type, value_data_type|
-  Property.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
+string_validations.each do |name, desc, rule, field_data_type, value_data_type|
+  Validation.create( name: name, description: desc, rule: rule, field_data_type_id: field_data_type, value_data_type_id: value_data_type)
 end
 
 
@@ -79,9 +79,9 @@ employee_first_name = employee.fields.create( name: "first_name", description: "
 
 employee_last_name = employee.fields.create( name: "last_name", description: "Surname of employee", data_type_id: 2 )
 employee_age = employee.fields.create( name: "age", description: "Age of employee", data_type_id: 1 )
-employee_age_gt = employee_age.property_assignments.create(property_id: 2)
+employee_age_gt = employee_age.validation_assignments.create(validation_id: 2)
 employee_age_gt.create_value(value:"18",data_type_id: 1)
-employee_age_lt = employee_age.property_assignments.create(property_id: 5)
+employee_age_lt = employee_age.validation_assignments.create(validation_id: 5)
 employee_age_lt.create_value(value:"80",data_type_id: 1)
 
 store = project.tables.create( name: "Store", description: "Store Information")

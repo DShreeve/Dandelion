@@ -1,0 +1,26 @@
+<%= form_for([@project,@table,@field,@validation_assignment], html: {class:"form-horizontal"}) do |f| %>
+  <% if @validation_assignment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@validation_assignment.errors.count, "error") %> prohibited this validation_assignment from being saved:</h2>
+
+      <ul>
+      <% @validation_assignment.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :validation_id , class: "col-sm-2 control-label" %>
+    <div class="col-sm-10">
+      <%= f.collection_select :validation_id, @validations, :id, :name,class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <%= f.submit "Submit" , class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

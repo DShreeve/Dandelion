@@ -1,0 +1,28 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Validations</h1>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Rule</th>
+      <th>Field data type</th>
+      <th>Value data type</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @validations.each do |validation| %>
+      <tr>
+        <td><%= validation.name %></td>
+        <td><%= validation.description %></td>
+        <td><%= validation.rule %></td>
+        <td><%= DataType.find(validation.field_data_type_id).name %></td>
+        <td><%= DataType.find(validation.value_data_type_id).name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

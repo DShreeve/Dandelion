@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170320200721) do
+ActiveRecord::Schema.define(version: 20170501145258) do
 
   create_table "data_types", force: :cascade do |t|
     t.string   "name"
@@ -38,26 +38,6 @@ ActiveRecord::Schema.define(version: 20170320200721) do
     t.datetime "updated_at",  null: false
   end
 
-  create_table "properties", force: :cascade do |t|
-    t.string   "name"
-    t.string   "description"
-    t.string   "rule"
-    t.integer  "field_data_type_id"
-    t.integer  "value_data_type_id"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
-  end
-
-  create_table "property_assignments", force: :cascade do |t|
-    t.integer  "field_id"
-    t.integer  "property_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
-  add_index "property_assignments", ["field_id"], name: "index_property_assignments_on_field_id"
-  add_index "property_assignments", ["property_id"], name: "index_property_assignments_on_property_id"
-
   create_table "tables", force: :cascade do |t|
     t.string   "name"
     t.string   "description"
@@ -68,14 +48,34 @@ ActiveRecord::Schema.define(version: 20170320200721) do
 
   add_index "tables", ["project_id"], name: "index_tables_on_project_id"
 
+  create_table "validation_assignments", force: :cascade do |t|
+    t.integer  "field_id"
+    t.integer  "validation_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "validation_assignments", ["field_id"], name: "index_validation_assignments_on_field_id"
+  add_index "validation_assignments", ["validation_id"], name: "index_validation_assignments_on_validation_id"
+
+  create_table "validations", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.string   "rule"
+    t.integer  "field_data_type_id"
+    t.integer  "value_data_type_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
   create_table "values", force: :cascade do |t|
     t.string   "value"
     t.integer  "data_type_id"
-    t.integer  "property_assignment_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.integer  "validation_assignment_id"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
-  add_index "values", ["property_assignment_id"], name: "index_values_on_property_assignment_id"
+  add_index "values", ["validation_assignment_id"], name: "index_values_on_validation_assignment_id"
 
 end

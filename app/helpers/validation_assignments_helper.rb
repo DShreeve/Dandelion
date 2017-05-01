@@ -1,0 +1,2 @@
+module ValidationAssignmentsHelper
+end

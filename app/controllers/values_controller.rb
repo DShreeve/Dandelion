@@ -2,15 +2,15 @@ class ValuesController < ApplicationController
   before_action :get_project
   before_action :get_table
   before_action :get_field
-  before_action :get_property_assignment
+  before_action :get_validation_assignment
   before_action :set_value, only: [:show, :edit, :update, :destroy]
   before_action :get_value_data_type, only: [ :new, :edit]
-  before_action :get_property, only: [ :new, :edit]
+  before_action :get_validation, only: [ :new, :edit]
 
   # GET /values
   # GET /values.json
   def index
-    @values = @property_assignment.value
+    @values = @validation_assignment.value
   end
   # GET /values/1
   # GET /values/1.json
@@ -19,7 +19,7 @@ class ValuesController < ApplicationController
 
   # GET /values/new
   def new
-    @value = @property_assignment.build_value
+    @value = @validation_assignment.build_value
   end
 
   # GET /values/1/edit
@@ -29,8 +29,8 @@ class ValuesController < ApplicationController
   # POST /values
   # POST /values.json
   def create
-    @value = @property_assignment.build_value(value_params)
-    @value.data_type_id =  DataType.find(@property_assignment.property.value_data_type_id).id
+    @value = @validation_assignment.build_value(value_params)
+    @value.data_type_id =  DataType.find(@validation_assignment.validation.value_data_type_id).id
     respond_to do |format|
       if @value.save
         format.html { redirect_to project_table_field_path(@project, @table, @field), notice: 'Value was successfully created.' }
@@ -69,7 +69,7 @@ class ValuesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_value
-      @value = @property_assignment.value
+      @value = @validation_assignment.value
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
@@ -90,14 +90,14 @@ class ValuesController < ApplicationController
       @field = @table.fields.find(params[:field_id])
     end
 
-    def get_property_assignment
-      @property_assignment = @field.property_assignments.find(params[:property_assignment_id])
+    def get_validation_assignment
+      @validation_assignment = @field.validation_assignments.find(params[:validation_assignment_id])
     end
 
-    def get_property
-      @property =Property.find(@property_assignment.property_id)
+    def get_validation
+      @validation =Validation.find(@validation_assignment.validation_id)
     end
     def get_value_data_type
-      @value_data_type = DataType.find(@property_assignment.property.value_data_type_id).name
+      @value_data_type = DataType.find(@validation_assignment.validation.value_data_type_id).name
     end
 end

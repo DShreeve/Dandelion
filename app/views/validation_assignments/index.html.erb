@@ -1,0 +1,36 @@
+<p id="notice"><%= notice %></p>
+
+<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <u>Validations</u></h1>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Validation</th>
+      <th>Value</th>
+      <th colspan="2"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @validation_assignments.each do |validation_assignment| %>
+      <tr>
+        <td><%= Validation.find(validation_assignment.validation_id).name %></td>
+        
+        <% if validation_assignment.value == nil %>
+          <td>no value</td>
+          <td><%= link_to 'Assign Value', new_project_table_field_validation_assignment_value_path(@project, @table, @field, validation_assignment) %></td>
+        <% else %>
+          <td> <%= validation_assignment.value.value %></td>
+          <td><%= link_to 'Edit Value', edit_project_table_field_validation_assignment_value_path(@project, @table, @field, validation_assignment, validation_assignment.value) %></td>
+        <% end %>
+        <td><%= link_to 'Destroy', project_table_field_validation_assignment_path(@project, 
+          @table, @field,validation_assignment), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+<%= link_to 'Back', project_table_fields_path(@project, @table, @field), class:"btn btn-default" %>
+<%= link_to 'New Validation assignment', new_project_table_field_validation_assignment_path(
+  @project, @table, @field), class: "btn btn-primary"  %>

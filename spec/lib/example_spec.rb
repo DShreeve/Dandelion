@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Table do
   describe "field name" do
-    context "property" do
+    context "validation" do
       it "has this behaviour" do
         table = build( :table)
         if table.respond_to?(:valid?)

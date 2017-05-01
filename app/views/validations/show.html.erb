@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Validation</h1>
+
+<p>
+  <strong>Name:</strong>
+  <%= @validation.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @validation.description %>
+</p>
+
+<p>
+  <strong>Rule:</strong>
+  <%= @validation.rule %>
+</p>
+
+<p>
+  <strong>Field data type:</strong>
+  <%= @validation.field_data_type_id %>
+</p>
+
+<p>
+  <strong>Value data type:</strong>
+  <%= @validation.value_data_type_id %>
+</p>
+
+<%= link_to 'Back', validations_path, class: "btn btn-default" %>
+<%= link_to 'Edit', edit_validation_path(@validation), class: "btn btn-warning" %>

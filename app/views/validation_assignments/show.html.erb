@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Field:</strong>
+  <%= @validation_assignment.field_id %>
+</p>
+
+<p>
+  <strong>Validation:</strong>
+  <%= @validation_assignment.validation_id %>
+</p>
+
+<%= link_to 'Back', validation_assignments_path, class: "btn btn-default" %>
+<%= link_to 'Edit', edit_validation_assignment_path(@validation_assignment), class: "btn btn-warning" %>

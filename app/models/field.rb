@@ -13,8 +13,8 @@
 
 class Field < ActiveRecord::Base
   belongs_to :table
-  has_many :property_assignments, dependent: :destroy, inverse_of: :field
-  has_many :properties, through: :property_assignments
+  has_many :validation_assignments, dependent: :destroy, inverse_of: :field
+  has_many :validations, through: :validation_assignments
 
   validates :name, 
     format: {with: /\A[a-z].*\Z/, message: "Must not start with capital letter"},

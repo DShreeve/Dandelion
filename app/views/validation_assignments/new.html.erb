@@ -1,4 +1,6 @@
-<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <%= @validation.name %> > <u>Assign Value</u></h1>
+<h1><%= @project.name %> > <%= @table.name %> > <%= @field.name %> > <u>New Validation</u></h1>
 
 <%= render 'form' %>
+
 <%= link_to 'Back', project_table_field_path(@project, @table, @field), class: "btn btn-default" %>
+

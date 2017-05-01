@@ -15,14 +15,14 @@
     <tr>
       <td><%= @value.value %></td>
       <td><%= @value.data_type_id %></td>
-      <td><%= @value.property_assignment_id %></td>
-      <td><%= link_to 'Show', project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value) %></td>
-      <td><%= link_to 'Edit', edit_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value) %></td>
-      <td><%= link_to 'Destroy', project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment, @value), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <td><%= @value.validation_assignment_id %></td>
+      <td><%= link_to 'Show', project_table_field_validation_assignment_value_path(@project, @table, @field,@validation_assignment, @value) %></td>
+      <td><%= link_to 'Edit', edit_project_table_field_validation_assignment_value_path(@project, @table, @field,@validation_assignment, @value) %></td>
+      <td><%= link_to 'Destroy', project_table_field_validation_assignment_value_path(@project, @table, @field,@validation_assignment, @value), method: :delete, data: { confirm: 'Are you sure?' } %></td>
     </tr>
   </tbody>
 </table>
 
 <br>
-<%= link_to 'Back', project_table_field_property_assignments_path(@project,@table,@field,@property_assignment), class:"btn btn-default"%>
-<%= link_to 'New Value', new_project_table_field_property_assignment_value_path(@project, @table, @field,@property_assignment), class: "btn btn-primary"  %>
+<%= link_to 'Back', project_table_field_validation_assignments_path(@project,@table,@field,@validation_assignment), class:"btn btn-default"%>
+<%= link_to 'New Value', new_project_table_field_validation_assignment_value_path(@project, @table, @field,@validation_assignment), class: "btn btn-primary"  %>

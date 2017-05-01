@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   
   
-  resources :properties
+  resources :validations
   resources :data_types
 
   #Button for generating tests
@@ -10,19 +10,19 @@ Rails.application.routes.draw do
   get 'projects/new' => 'projects#new'
   get 'projects/:project_id/tables/new' => 'tables#new'
   get 'projects/:project_id/tables/:table_id/fields/new' => 'fields#new'
-  get 'projects/:project_id/tables/:table_id/fields/:field_id/property_assignments/new' => 'property_assignments#new'
-  get 'projects/:project_id/tables/:table_id/fields/:field_id/property_assignments/:property_assignment_id/values/new' => 'values#new'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id/validation_assignments/new' => 'validation_assignments#new'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id/validation_assignments/:validation_assignment_id/values/new' => 'values#new'
   
   #show => index
   get 'projects/:project_id' => 'tables#index'
   get 'projects/:project_id/tables/:table_id' => 'fields#index'
-  get 'projects/:project_id/tables/:table_id/fields/:field_id' => 'property_assignments#index'
+  get 'projects/:project_id/tables/:table_id/fields/:field_id' => 'validation_assignments#index'
   
   
   resources :projects do
     resources :tables do
       resources :fields do
-        resources :property_assignments do
+        resources :validation_assignments do
           resources :values
         end
       end
