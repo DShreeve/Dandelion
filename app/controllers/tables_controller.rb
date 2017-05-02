@@ -353,7 +353,8 @@ class TablesController < ApplicationController
   def generate_string_value(isolated, rest)
     # isolated can be passed as nil to generate a pass all
     # default regexp to generate strings
-    regexp = [/\A[a-zA-Z]*[a-zA-Z]*\z/, /\A[\w]*[\w]*\z/, /\A[\w]*[[:punct:]]*[\w]*\z/, /\A[\w]*[[:print:]]*[a-zA-Z]*\z/]
+    regexp = [/\A[a-zA-Z]*[a-zA-Z]*\z/, /\A[\w]*[\w]*\z/, /\A[\w]*[[:punct:]]*[\w]*\z/, 
+      /\A[\w]*[[:print:]]*[a-zA-Z]*\z/]
     # Add users regexp to the defaults if in rest
     if !rest.empty?
         if validations_contain?("format", rest)
@@ -387,7 +388,6 @@ class TablesController < ApplicationController
       if strings.empty?
         next
       else
-        # Prefix and Suffix speech marks and esacpe '/'' and '"' for writing to file
         return prep_string(strings.sample)
       end     
     end

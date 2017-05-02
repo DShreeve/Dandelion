@@ -17,7 +17,7 @@ class Field < ActiveRecord::Base
   has_many :validations, through: :validation_assignments
 
   validates :name, 
-    format: {with: /\A[a-z].*\Z/, message: "Must not start with capital letter"},
+    format: {with: /\A[a-z][a-z_]*[a-z]\Z/, message: "Must follow lower case underscore naming convention"},
     presence: true, 
     uniqueness: {scope: :table_id, message:"Field already present in table"}
 
