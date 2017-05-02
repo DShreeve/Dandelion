@@ -132,7 +132,7 @@ class TablesController < ApplicationController
           # Array we can manipulate
           rest = [].replace(validations)
           rest.delete_if{ |e| e == p} # remove isolated rule
-          file.puts "\t\tit \"is invalid with value " + p[0].to_s + " " + p[1].to_s + "\" do"
+          file.puts "\t\tit \"is invalid with a value thats is not " + p[0].to_s + " " + p[1].to_s + "\" do"
           if DataType.find(f.data_type_id).name == "String"
             value = generate_string_value(p, rest)
             hash[:generatedValue] = value

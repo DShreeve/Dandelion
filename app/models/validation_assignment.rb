@@ -10,6 +10,7 @@
 #
 
 class ValidationAssignment < ActiveRecord::Base
+  validate :field_exist?
   belongs_to :validation
   belongs_to :field
   has_one :value, dependent: :destroy, inverse_of: :validation_assignment
@@ -18,5 +19,10 @@ class ValidationAssignment < ActiveRecord::Base
 
   validates :validation_id, presence: true
 
+  def field_exist?
+    if (Field.where(id: field_id).length) < 1
+      errors.add(:field_presence, "that field doesnt exist")
+    end
+  end
 
 end

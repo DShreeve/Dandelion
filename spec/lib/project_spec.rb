@@ -1,35 +1,30 @@
 require "rails_helper"
-require "project"
 
 describe Project do
   
-  it "is valid with valid attributes" do
-    project = build( :project)
-    if project.respond_to?(:valid?)
-      expect(project).to be_valid, lambda { project.errors.full_messages.join("\n") }
-    end
+  it "can be created" do
+    project = create( :project)
+    expect(Project.where(id: project.id).length).to eq(1)
   end
 
-  it "is not valid without a name" do
-    project = build( :project, name: nil)
-    if project.respond_to?(:valid?)
-      expect(project).to_not be_valid, lambda { project.errors.full_messages.join("\n") }
-    end
+  it "can be edited" do
+    project = create( :project, name:"Table")
+    project.name = "Change"
+    project.save
+    expect(Project.where(id: project.id).first.name).to eq("Change")
   end
 
-  it "is not valid without a capitalised name" do
-    project = build( :project, name: "lowercase")
-    if project.respond_to?(:valid?)
-      expect(project).to_not be_valid, lambda { project.errors.full_messages.join("\n") }
-    end
+  it "can be deleted" do
+    project = create( :project)
+    project.destroy
+    expect(Project.where(id: project.id).length).to eq(0)
   end
 
-  it "is valid without a description" do
-    project = build( :project, description: nil)
-    if project.respond_to?(:valid?)
-      expect(project).to be_valid, lambda { project.errors.full_messages.join("\n") }
-    end
+  it "deletes associated tables when deleted" do
+    project = create( :project)
+    table = create(:table, project_id: project.id)
+    project.destroy
+    expect(Table.where(id: table.id).length).to eq(0)
   end
-
 
 end

@@ -13,6 +13,7 @@
 
 
 class Value < ActiveRecord::Base
+  validate :validation_assignment_exist?
   belongs_to :validation_assignment
 
   validates :value , presence: true
@@ -21,4 +22,10 @@ class Value < ActiveRecord::Base
 
   validates :validation_assignment_id , presence: true
 
+
+  def validation_assignment_exist?
+    if (ValidationAssignment.where(id: validation_assignment_id).length) < 1
+      errors.add(:validation_assignment_presence, "that validation assignment doesnt exist")
+    end
+  end
 end
