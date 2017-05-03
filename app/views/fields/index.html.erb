@@ -17,7 +17,7 @@
       <tr>
         <td><%= field.name %></td>
         <td><%= field.description %></td>
-        <td><%= field.data_type_id %></td>
+        <td><%= DataType.find(field.data_type_id).name %></td>
         <td><%= link_to 'Show', project_table_field_path(@project, @table, field) %></td>
         <td><%= link_to 'Edit', edit_project_table_field_path(@project, @table, field) %></td>
         <td><%= link_to 'Destroy', project_table_field_path(@project, @table, field), method: :delete, data: { confirm: 'Are you sure?' } %></td>

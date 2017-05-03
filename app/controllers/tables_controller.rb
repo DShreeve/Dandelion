@@ -117,6 +117,7 @@ class TablesController < ApplicationController
           value = generate_string_value(nil, validations)
           hash[:generatedValue] = value
           file << test_text(true, hash, 3)
+          file.puts ""
         else
           value = 0
           if DataType.find(f.data_type_id).name == "Float"
@@ -140,9 +141,9 @@ class TablesController < ApplicationController
           else
             value = 0
             if DataType.find(f.data_type_id).name == "Float"
-              value = generate_value_integer(nil, validations, "Float")
+              value = generate_value_integer(p, rest, "Float")
             elsif DataType.find(f.data_type_id).name == "Integer"
-              value = generate_value_integer(nil, validations, "Integer")
+              value = generate_value_integer(p, rest, "Integer")
             end
             hash[:generatedValue] = value
             file << test_text(false, hash, 3)
@@ -331,6 +332,7 @@ class TablesController < ApplicationController
       end            
       rest.each do |rule|
         numbers = pass_num_rule(numbers, rule[0], rule[1])
+        
         if numbers.empty?
           break
         end
@@ -406,7 +408,7 @@ class TablesController < ApplicationController
       value = value.to_f
     end
     if rule == "divisible"
-      return numbers.keep_if{ |n| n % value == 0}
+      return numbers.keep_if{ |n| (n % value) == 0}
     else # ASSUMED: Only >,>=,<,<= validations can progress to here
       # Comparorator stored as string in database e.g ">"
       return numbers.keep_if{ |n| n.method(rule).(value) }
@@ -420,7 +422,7 @@ class TablesController < ApplicationController
       value = value.to_f
     end
     if rule == "divisible"
-      return numbers.delete_if{ |n| n % value == 0 }
+      return numbers.delete_if{ |n| (n % value) == 0 }
     else # ASSUMED: Only >,>=,<,<= validations can progress to here
       # Comparorator stored as string in database e.g ">"
       return numbers.delete_if{ |n| n.method(rule).(value) }
