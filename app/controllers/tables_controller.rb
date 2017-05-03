@@ -71,9 +71,9 @@ class TablesController < ApplicationController
     #file = File.open(fileName, "w")
     file = Tempfile.new(fileName,'tmp')
     # Introduction/Set-up file
-    file.puts "require \"spec_helper\""
+    file.puts "require \"rails_helper\""
     file.puts ""
-    file.puts "desrcibe \"" + table.name.titleize + "\" do"
+    file.puts "describe " + table.name.titleize + " do"
     file.puts ""
     file << write_factory_test(table.name, 1)
 
@@ -117,6 +117,7 @@ class TablesController < ApplicationController
           value = generate_string_value(nil, validations)
           hash[:generatedValue] = value
           file << test_text(true, hash, 3)
+          file.puts "\t\tend"
           file.puts ""
         else
           value = 0
@@ -127,6 +128,8 @@ class TablesController < ApplicationController
           end
           hash[:generatedValue] = value
           file << test_text(true, hash, 3)
+          file.puts "\t\tend"
+          file.puts ""
         end
         # Write test isolating each validation to be invalid
         validations.each do |p|
@@ -233,7 +236,7 @@ class TablesController < ApplicationController
     inCorrectTestText = test_text(false,hash,3)
     correct_intro = "\t\tit \"is valid with a value from inclusion\" do\n"
     incorrect_intro = "\t\tit \"is invalid with a value not in inclusion\" do\n"
-    return correct_intro + correctTestText + incorrect_intro + inCorrectTestText 
+    return correct_intro + correctTestText+ "\t\tend\n" + incorrect_intro + inCorrectTestText + "\t\tend\n\tend\n"
   end
 
   def string_inclusion(hash, includedValues)
@@ -259,7 +262,7 @@ class TablesController < ApplicationController
     inCorrectTestText = test_text(false, hash, 3)
     correct_intro = "\t\tit \"is valid with a value from inclusion\" do\n"
     incorrect_intro = "\t\tit \"is invalid with a value not in inclusion\" do\n"
-    return correct_intro + correctTestText + incorrect_intro + inCorrectTestText 
+    return correct_intro + correctTestText + "\t\tend\n" + incorrect_intro + inCorrectTestText + "\t\tend\n\tend\n"
   end
 
   def validations_contain?(rule, rules)
@@ -467,7 +470,8 @@ class TablesController < ApplicationController
   end
 
   def gen_rand_float_array(amount)
-    array = amount.times.map{Random.rand(-1000000.0 .. 1000000.0)}
+    array = amount.times.map{Random.rand(-100000.0 .. 100000.0)}
+    array.map!{ |n| n.round(2)}
     return array
   end
 
